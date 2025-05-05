@@ -18,6 +18,9 @@ defmodule GaldrWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/notes", NoteLive.Index, :index
+    live "/notes/new", NoteLive.Form, :new
+    live "/notes/:id", NoteLive.Show, :show
   end
 
   # Other scopes may use custom stacks.

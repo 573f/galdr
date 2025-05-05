@@ -5,7 +5,7 @@ defmodule Galdr.Knowledge.Note do
   schema "notes" do
     field :title, :string
     field :content, :string
-    field :status, :string, default: "active" # active, archived
+    field :status, :string
     field :position, :integer
     field :last_accessed, :utc_datetime
 
@@ -16,7 +16,6 @@ defmodule Galdr.Knowledge.Note do
   def changeset(note, attrs) do
     note
     |> cast(attrs, [:title, :content, :status, :position, :last_accessed])
-    |> validate_required([:title])
-    |> unique_constraint(:title)
+    |> validate_required([:title, :content, :status, :position, :last_accessed])
   end
 end

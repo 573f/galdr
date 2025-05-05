@@ -1,5 +1,22 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss" source(none);
+@source "../css";
+@source "../js";
+@source "../../lib/galdr_web";
 
-/* This file is for your main application CSS */
+@plugin "../vendor/daisyui" {
+  /* In practice, you will likely ship only with two themes, as below: */
+  /* themes: light --default, dark --prefersdark; */
+  themes: all;
+}
+
+@plugin "../icons.js";
+@variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
+@variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
+@variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
+
+/*
+ * Make LiveView wrapper divs transparent for layout.
+ * This makes it possible to use LiveViews as flex children for example.
+ */
+[data-phx-root-id] { display: contents }
+

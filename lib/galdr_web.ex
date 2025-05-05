@@ -81,6 +81,9 @@ defmodule GaldrWeb do
 
   defp html_helpers do
     quote do
+      # Translation
+      use Gettext, backend: GaldrWeb.Gettext
+      
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation

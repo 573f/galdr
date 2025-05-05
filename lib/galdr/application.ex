@@ -12,8 +12,6 @@ defmodule Galdr.Application do
       Galdr.Repo,
       {DNSCluster, query: Application.get_env(:galdr, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Galdr.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: Galdr.Finch},
       # Start a worker by calling: Galdr.Worker.start_link(arg)
       # {Galdr.Worker, arg},
       # Start to serve requests, typically the last entry
