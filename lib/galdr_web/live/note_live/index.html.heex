@@ -1,0 +1,64 @@
+<div class="container mx-auto">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-base-200 p-4 overflow-y-auto border-r border-base-300">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Knowledge</h1>
+        <.link patch={~p"/notes/new"} class="btn btn-primary btn-sm">
+          New Rune
+        </.link>
+      </div>
+      
+      <div class="space-y-2">
+        <%= if @notes |> Enum.empty?() do %>
+          <div class="alert alert-info">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>No knowledge runes yet. Create your first one!</span>
+            </div>
+          </div>
+        <% else %>
+          <%= for note <- @notes do %>
+            <.link navigate={~p"/notes/#{note}"} class="block">
+              <div class="card bg-base-100 shadow-sm hover:shadow-md mb-2">
+                <div class="card-body p-3">
+                  <h3 class="card-title text-sm"><%= note.title %></h3>
+                  <p class="text-xs opacity-70 truncate">
+                    <%= if note.content, do: String.slice(note.content || "", 0, 50) %>
+                  </p>
+                </div>
+              </div>
+            </.link>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="w-3/4 p-4 overflow-y-auto bg-base-100">
+      <h1 class="text-2xl font-bold mb-4">Knowledge Runes</h1>
+      
+      <div class="prose max-w-none">
+        <%= if @live_action in [:new, :edit] do %>
+          <.live_component
+            module={GaldrWeb.NoteLive.FormComponent}
+            id={@note.id || :new}
+            title={@page_title}
+            action={@live_action}
+            note={@note}
+            return_to={~p"/"}
+          />
+        <% else %>
+          <div class="hero min-h-64 bg-base-200 rounded-lg">
+            <div class="hero-content text-center">
+              <div class="max-w-md">
+                <h2 class="text-3xl font-bold">⊚</h2>
+                <p class="py-6">Select a knowledge rune or create a new one</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

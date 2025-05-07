@@ -2,53 +2,41 @@ defmodule GaldrWeb.NoteLive.Index do
   use GaldrWeb, :live_view
 
   alias Galdr.Knowledge
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-      <.header>
-        Listing Notes
-        <:actions>
-          <.link navigate={~p"/notes/new"}>
-            <.icon name="hero-plus" /> New Note
-          </.link>
-        </:actions>
-      </.header>
-
-      <.table
-        id="notes"
-        rows={@streams.notes}
-        row_click={fn {_id, note} -> JS.navigate(~p"/notes/#{note}") end}
-      >
-        <:col :let={{_id, note}} label="Title">{note.title}</:col>
-        <:col :let={{_id, note}} label="Content">{note.content}</:col>
-        <:col :let={{_id, note}} label="Status">{note.status}</:col>
-        <:col :let={{_id, note}} label="Position">{note.position}</:col>
-        <:col :let={{_id, note}} label="Last accessed">{note.last_accessed}</:col>
-        <:action :let={{_id, note}}>
-          <div class="sr-only">
-            <.link navigate={~p"/notes/#{note}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/notes/#{note}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, note}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: note.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
-      </.table>
-    """
-  end
+  alias Galdr.Knowledge.Note
 
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Listing Notes")
-     |> stream(:notes, Knowledge.list_notes())}
+     |> assign(:notes, Knowledge.list_notes())
+     |> assign(:selected_note, nil)}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Galdr - Your Knowledge")
+    |> assign(:note, nil)
+  end
+
+  defp apply_action(socket, :new, _params) do
+    socket
+    |> assign(:page_title, "New Rune")
+    |> assign(:note, %Note{})
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    note = Knowledge.get_note!(id)
+    Knowledge.update_last_accessed(note)
+
+    socket
+    |> assign(:page_title, "Edit #{note.title}")
+    |> assign(:note, note)
+    |> assign(:selected_note, note)
   end
 
   @impl true
@@ -56,6 +44,15 @@ defmodule GaldrWeb.NoteLive.Index do
     note = Knowledge.get_note!(id)
     {:ok, _} = Knowledge.delete_note(note)
 
-    {:noreply, stream_delete(socket, :notes, note)}
+    notes = Knowledge.list_notes()
+
+    selected_note =
+      if socket.assigns.selected_note && socket.assigns.selected_note.id == note.id do
+        nil
+      else
+        socket.assigns.selected_note
+      end
+
+    {:noreply, assign(socket, notes: notes, selected_note: selected_note)}
   end
 end

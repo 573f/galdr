@@ -2,25 +2,30 @@ defmodule GaldrWeb.Router do
   use GaldrWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, html: {GaldrWeb.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, html: {GaldrWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", GaldrWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    get "/", PageController, :home
-    live "/notes", NoteLive.Index, :index
-    live "/notes/new", NoteLive.Form, :new
-    live "/notes/:id", NoteLive.Show, :show
+    # Make the root path go directly to notes index
+    live("/", NoteLive.Index, :index)
+
+    # Note routes
+    live("/notes", NoteLive.Index, :index)
+    live("/notes/new", NoteLive.Index, :new)
+    live("/notes/:id/edit", NoteLive.Index, :edit)
+    live("/notes/:id", NoteLive.Show, :show)
+    live("/notes/:id/show/edit", NoteLive.Show, :edit)
   end
 
   # Other scopes may use custom stacks.
@@ -38,10 +43,10 @@ defmodule GaldrWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: GaldrWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: GaldrWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end

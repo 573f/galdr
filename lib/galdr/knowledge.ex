@@ -101,4 +101,11 @@ defmodule Galdr.Knowledge do
   def change_note(%Note{} = note, attrs \\ %{}) do
     Note.changeset(note, attrs)
   end
+
+  @doc """
+  Updates a note's last_accessed timestamp
+  """
+  def update_last_accessed(%Note{} = note) do
+    update_note(note, %{last_accessed: DateTime.utc_now()})
+  end
 end

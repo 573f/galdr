@@ -3,11 +3,11 @@ defmodule Galdr.Knowledge.Note do
   import Ecto.Changeset
 
   schema "notes" do
-    field :title, :string
-    field :content, :string
-    field :status, :string
-    field :position, :integer
-    field :last_accessed, :utc_datetime
+    field(:title, :string)
+    field(:content, :string)
+    field(:status, :string)
+    field(:position, :integer)
+    field(:last_accessed, :utc_datetime)
 
     timestamps(type: :utc_datetime)
   end
@@ -16,6 +16,7 @@ defmodule Galdr.Knowledge.Note do
   def changeset(note, attrs) do
     note
     |> cast(attrs, [:title, :content, :status, :position, :last_accessed])
-    |> validate_required([:title, :content, :status, :position, :last_accessed])
+    |> validate_required([:title])
+    |> unique_constraint(:title)
   end
 end
