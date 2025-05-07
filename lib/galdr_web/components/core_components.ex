@@ -32,73 +32,47 @@ defmodule GaldrWeb.CoreComponents do
   alias Phoenix.LiveView.JS
 
   def modal(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:show, fn -> true end)
+      |> assign_new(:id, fn -> "modal-#{:erlang.unique_integer([:positive, :monotonic])}" end)
+
     ~H"""
     <div
       id={@id}
-      class="fixed inset-0 z-50 flex items-center justify-center"
+      class="modal modal-open"
       phx-mounted={@show && show_modal(@id)}
       phx-remove={hide_modal(@id)}
     >
-      <div id={"#{@id}-bg"} class="fixed inset-0 bg-base-300 bg-opacity-80 transition-opacity"></div>
-      <div
-        class="w-full max-w-xl p-4 relative transform overflow-y-auto rounded-lg bg-base-100 shadow-xl transition-all"
-        id={"#{@id}-container"}
-        phx-click-away={JS.dispatch("click", to: "##{@id}-close")}
-        phx-window-keydown={JS.dispatch("click", to: "##{@id}-close")}
-        phx-key="escape"
-      >
-        <div class="absolute top-4 right-4">
-          <button
-            id={"#{@id}-close"}
-            phx-click={hide_modal(@id)}
-            class="btn btn-sm btn-circle btn-ghost"
-            aria-label="close"
-          >
-            ✕
-          </button>
-        </div>
-        <div id={"#{@id}-content"}>
-          <%= render_slot(@inner_block) %>
-        </div>
+      <div class="modal-box">
+        <.link
+          :if={assigns[:return_to]}
+          navigate={@return_to}
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        >
+          ✕
+        </.link>
+        <%= render_slot(@inner_block) %>
       </div>
+      <.link
+        :if={assigns[:return_to]}
+        navigate={@return_to}
+        class="modal-backdrop"
+      >
+      </.link>
     </div>
     """
   end
 
-  # Add these functions
   defp show_modal(js \\ %JS{}, id) do
     js
-    |> JS.show(to: "##{id}")
-    |> JS.show(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
-    )
-    |> JS.show(
-      to: "##{id}-container",
-      transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
-         "opacity-100 translate-y-0 sm:scale-100"}
-    )
-    |> JS.add_class("overflow-hidden", to: "body")
-    |> JS.focus_first(to: "##{id}-content")
+    |> JS.add_class("modal-open", to: "##{id}")
+    |> JS.focus_first(to: "##{id} .modal-box")
   end
 
   defp hide_modal(js \\ %JS{}, id) do
     js
-    |> JS.hide(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
-    )
-    |> JS.hide(
-      to: "##{id}-container",
-      transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
-    )
-    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
-    |> JS.remove_class("overflow-hidden", to: "body")
+    |> JS.remove_class("modal-open", to: "##{id}")
     |> JS.pop_focus()
   end
 

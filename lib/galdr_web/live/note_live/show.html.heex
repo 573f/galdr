@@ -37,14 +37,16 @@
     <!-- Main Content -->
     <div class="w-3/4 p-4 overflow-y-auto bg-base-100">
       <%= if @live_action == :edit do %>
-        <.live_component
-          module={GaldrWeb.NoteLive.FormComponent}
-          id={@note.id}
-          title={@page_title}
-          action={@live_action}
-          note={@note}
-          return_to={~p"/notes/#{@note}"}
-        />
+        <.modal id="note-modal" return_to={~p"/notes"}>
+          <.live_component
+            module={GaldrWeb.NoteLive.FormComponent}
+            id={@note.id}
+            title={@page_title}
+            action={@live_action}
+            note={@note}
+            return_to={~p"/notes"}
+          />
+        </.modal>
       <% else %>
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold"><%= @note.title %></h2>

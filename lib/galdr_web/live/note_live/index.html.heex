@@ -40,14 +40,16 @@
       
       <div class="prose max-w-none">
         <%= if @live_action in [:new, :edit] do %>
-          <.live_component
-            module={GaldrWeb.NoteLive.FormComponent}
-            id={@note.id || :new}
-            title={@page_title}
-            action={@live_action}
-            note={@note}
-            return_to={~p"/"}
-          />
+          <.modal id="note-modal" return_to={~p"/notes"}>
+            <.live_component
+              module={GaldrWeb.NoteLive.FormComponent}
+              id={@note.id || :new}
+              title={@page_title}
+              action={@live_action}
+              note={@note}
+              return_to={~p"/notes"}
+            />
+          </.modal>
         <% else %>
           <div class="hero min-h-64 bg-base-200 rounded-lg">
             <div class="hero-content text-center">
